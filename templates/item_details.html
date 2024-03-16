@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* .filters-item_details {
+            /* margin-top: -27px;
+            margin-left: 190px;
+            padding-left: 50px; 
+        } */
+
+        .search {
+            display: flex;
+            /* justify-content: center; */
+            justify-content: space-evenly;
+            margin-bottom: 20px;
+            margin-left: 250px;
+            max-height: 350px;
+            /* box-shadow: 0 5px #888888; */
+            width: 1400px;
+        }
+
+        .pad-15 {
+            padding-top: 48px;
+        }
+
+        .grid1 {
+            display: grid;
+            /* margin-right: 30px; */
+            box-shadow: 1px 1px 1px 1px black;
+            background-color: lightgray;
+            padding: 10px;
+        }
+
+        .search input {
+            width: 300px;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .container1 {
+            /* margin-top: 10px; */
+            margin: 50px;
+            margin-left: 250px;
+            width: 1400px;
+            border: 2px solid black;
+            /* justify-content: space-between; */
+        }
+
+        table,
+        td {
+            border: 1px solid black;
+            /* border-collapse: collapse; */
+            width: 1200px;
+            text-align: center;
+        }
+
+        td {
+            height: 40px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        table {
+            width: 1400px;
+            border: 2px solid black;
+        }
+
+        th {
+            border: 2px solid black;
+            border-collapse: collapse;
+            background-color: lightgray;
+            width: 1200px;
+            /* width: max-content; */
+            height: 40px;
+            text-align: center;
+            /* width:100% */
+            white-space: nowrap;
+            /* color: white; */
+        }
+
+        .matter {
+            overflow-x: scroll;
+            overflow-y: scroll;
+            width: 1400px;
+            /* margin-left: 200px; */
+            height: auto;
+        }
+
+        .button-container {
+            display: flex;
+            /* justify-content: center; */
+            /* Adjust as needed */
+            /* align-items: center; */
+            margin-left: 720px;
+            
+            /* Adjust as needed */
+        }
+
+        .button-container div {
+            margin: 5px;
+        }
+
+        .label-input-pair {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+
+        .label-input-pair label {
+            width: 150px;
+            /* Adjust the width as needed */
+            margin-right: 10px;
+            text-align: left;
+        }
+
+        .label-input-pair input {
+            width: 200px;
+            /* Adjust the width as needed */
+        }
+
+        .add {
+            overflow-y: auto;
+            border: 2px solid black;
+            /* box-shadow: 5px 10px #888880; */
+            border-radius: 10px;
+            width: 600px;
+            display: none;
+            overflow-x: visible;
+            height: 220px;
+            padding: 20px;
+            margin-left: 650px;
+            text-align: center;
+            justify-items: center; 
+            /* display: grid; */
+        }
+
+        .btn {
+            align-items: center;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="/main">Home</a></li>
+            <li><a href="/item_details">Item Details</a></li>
+            <li><a href="/inventory">Inventory</a></li>
+            <li><a href="/purchase_orders">Purchase Orders</a></li>
+            <li><a href="/lookup_details">Lookup Details</a></li>
+        </ul>
+    </div>
+    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid mb-3 pt-3">
+
+            <a class="navbar-brand" href="/main">3S TECHNOLOGIES</a>
+            <a class="navbar-brand" href="/main">Home</a>
+            <a class="navbar-brand" href="/logout">Logout</a>
+        </div>
+    </nav>
+    <button class="toggle-btn" onclick="toggleSidebar()">Menu</button>
+    <h3 style="margin-top: 30px; text-align: center;margin-top: -10PX;font-size: 20PX;margin-left: 200PX;">ITEM DETAILS</h3>
+    <div class="filters-item_details" id="filters">
+       
+        <!-- <button class="toggle-btn" onclick="toggleSearchBar()"><i class="fa-solid fa-magnifying-glass"></i></button> -->
+        <div class="box1">
+            <div class="search">
+                <div class="grid1">
+                    <div class="label-input-pair">
+                        <label for="search_item_number">Item Number:</label>
+                        <input type="text" name="search" id="search_item_number">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_item_description">Item Description:</label>
+                        <input type="text" name="search" id="search_item_description">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_enabled_flag">Enabled Flag:</label>
+                        <input type="text" name="search" id="search_enabled_flag">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_item_type">Item Type:</label>
+                        <input type="text" name="search" id="search_item_type">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_uom">UOM:</label>
+                        <input type="text" name="search" id="search_uom">
+                    </div>
+                </div>
+                <div class="grid1">
+                    <div class="label-input-pair">
+                        <label for="search_manufacturer_code">Manufacturer Code:</label>
+                        <input type="text" name="search" id="search_manufacturer_code">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_item_category">Item Category:</label>
+                        <input type="text" name="search" id="search_item_category">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_cpu">CPU:</label>
+                        <input type="text" name="search" id="search_cpu">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_memory">Memory:</label>
+                        <input type="text" name="search" id="search_memory">
+                    </div>
+                    <div class="label-input-pair">
+                        <label for="search_disks">Disks:</label>
+                        <input type="text" name="search" id="search_disks">
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <div>
+                    <button onclick="fetchItemData(),toggleSearchBar()" class="button">Search</button>
+                </div>
+                <div>
+                    <button onclick="resetFilters()" class="reset">Reset</button>
+                </div>
+                <form action="/execute" method="post">
+                    <button  style="margin: 5px;"> Add Items</button>
+                </form>
+                <!-- <div>
+                    <button onclick="toggleAddBar()">Add Items</button>
+                </div> -->
+                <form action="/update" method="post">
+                    <button style="margin: 5px;">Update</button>
+                </form>
+                <form action="/upload" method="post">
+                    <button  style="margin: 5px;">Import</button>
+                </form>
+                <form action="/extract" method="post">
+                    <button  style="margin: 5px;">Export</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="add" style="display: none;">
+        <form>
+            <div class="label-input-pair">
+                <label for="ITEM_NUMBER">Item Number:</label>
+                <input type="text" name="ITEM_NUMBER" id="ITEM_NUMBER">
+            </div>
+            <div class="label-input-pair">
+                <label for="ITEM_DESCRIPTION">Item Description:</label>
+                <input type="text" name="ITEM_DESCRIPTION" id="ITEM_DESCRIPTION">
+            </div>
+            
+            <div class="label-input-pair">
+                <label for="ITEM_TYPE">Item Type:</label>
+                <input type="text" name="ITEM_TYPE" id="ITEM_TYPE">
+            </div>
+            <div class="label-input-pair">
+                <label for="MANUFACTURER_CODE">Manufacturer Code:</label>
+                <input type="text" name="MANUFACTURER_CODE" id="MANUFACTURER_CODE">
+            </div>
+            <div class="label-input-pair">
+                <label for="ITEM_CATEGORY">Item Category:</label>
+                <input type="text" name="ITEM_CATEGORY" id="ITEM_CATEGORY">
+            </div>
+            
+            <div class="label-input-pair">
+                <label for="CPU">CPU:</label>
+                <input type="text" name="CPU" id="CPU">
+            </div>
+            <div class="label-input-pair">
+                <label for="MEMORY">Memory:</label>
+                <input type="text" name="MEMORY" id="MEMORY">
+            </div>
+            <div class="label-input-pair">
+                <label for="DISKS">DISKS:</label>
+                <input type="text" name="DISKS" id="DISKS">
+            </div>
+            
+            <div class="label-input-pair">
+                <label for="UOM">UOM:</label>
+                <input type="text" name="UOM" id="UOM">
+            </div>
+            
+            <div class="label-input-pair">
+                <label for="ENABLED_FLAG">Enabled Flag:</label>
+                <select id="ENABLED_FLAG" name="ENABLED_FLAG">
+                    <option selected>Choose...</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
+            </div>
+            
+            <div class="label-input-pair">
+                <label for="CREATION_DATE">Creation Date:</label>
+                <input type="date" name="CREATION_DATE" id="CREATION_DATE" readonly>
+            </div>
+            
+            <div class="label-input-pair">
+                <label for="LAST_UPDATE_DATE">Last Update Date:</label>
+                <input type="date" name="LAST_UPDATE_DATE" id="LAST_UPDATE_DATE" readonly>
+            </div>
+            
+            <div class="button-container1">
+                <div>
+                    <button type="button" onclick="submitForm1()" class="button1">Save</button>
+                </div>
+                <div>
+                    <button type="button" onclick="toggleAddBar()" style="margin: 5px;">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="container1">
+        <div id="itemDataContainer" class="matter">
+            <table>
+                <tr>
+                    
+                    <th>Sno.</th>
+                    <th>ITEM NUMBER</th>
+                    <th>ITEM DESCRIPTION</th>
+                    <th>ITEM TYPE</th>
+                    <th>ITEM CATEGORY</th>
+                    <th>CPU</th>
+                    <th>MEMORY</th>
+                    <th>DISKS</th>
+                    <th>UOM</th>
+                    <th>ENABLED FLAG</th>
+                    <th>CREATION DATE</th>
+                    <th>CREATED BY</th>
+                    <th>LAST UPDATE DATE</th>
+                    <th>LAST UPDATED BY</th>
+                </tr>
+                
+            </table>
+        </div>
+    </div>
+
+
+    <script src="/static/index.js"></script>
+    <script>
+        function fetchItemData() {
+            // Collect filter values
+            // var item_id = document.getElementById("search_item_id").value;
+            var item_number = document.getElementById("search_item_number").value;
+            var item_description = document.getElementById("search_item_description").value;
+            var enabled_flag = document.getElementById("search_enabled_flag").value;
+            var item_type = document.getElementById("search_item_type").value;
+            var manufacturer_code = document.getElementById("search_manufacturer_code").value;
+            var item_category = document.getElementById("search_item_category").value;
+            var cpu = document.getElementById("search_cpu").value;
+            var memory = document.getElementById("search_memory").value;
+            var disks = document.getElementById("search_disks").value;
+            var uom = document.getElementById("search_uom").value;
+            // Use an AJAX request to fetch item data from the server
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Update the content of the data container with the fetched item data
+                    document.getElementById("itemDataContainer").innerHTML = xhr.responseText;
+                }
+            };
+
+            // Construct URL with filter parameters
+            var url = `/get_item_data?item_number=${encodeURIComponent(item_number)}&item_description=${encodeURIComponent(item_description)}&enabled_flag=${encodeURIComponent(enabled_flag)}&item_type=${encodeURIComponent(item_type)}&manufacturer_code=${encodeURIComponent(manufacturer_code)}&item_category=${encodeURIComponent(item_category)}&cpu=${encodeURIComponent(cpu)}&memory=${encodeURIComponent(memory)}&disks=${encodeURIComponent(disks)}&uom=${encodeURIComponent(uom)}`;
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+        function toggleSearchBar() {
+            var searchBar = document.querySelector('.search');
+            searchBar.style.display = (searchBar.style.display === 'none') ? 'flex' : 'none';
+        }
+        function resetFilters() {
+            // Reset all filter fields to empty
+            document.getElementById("search_item_number").value = "";
+            document.getElementById("search_item_description").value = "";
+            document.getElementById("search_enabled_flag").value = "";
+            document.getElementById("search_item_type").value = "";
+            document.getElementById("search_manufacturer_code").value = "";
+            document.getElementById("search_item_category").value = "";
+            document.getElementById("search_cpu").value = "";
+            document.getElementById("search_memory").value = "";
+            document.getElementById("search_disks").value = "";
+            document.getElementById("search_uom").value = "";
+        }
+        function toggleAddBar() {
+            var addBar = document.querySelector('.add');
+            addBar.style.display = (addBar.style.display === 'none') ? 'grid' : 'none';
+        }
+
+        function submitForm1() {
+            // Get data from the form
+            var ITEM_NUMBER = document.getElementById("ITEM_NUMBER").value;
+            var ITEM_DESCRIPTION = document.getElementById("ITEM_DESCRIPTION").value;
+            var ITEM_TYPE = document.getElementById("ITEM_TYPE").value;
+            var MANUFACTURER_CODE = document.getElementById("MANUFACTURER_CODE").value;
+            var ITEM_CATEGORY = document.getElementById("ITEM_CATEGORY").value;
+            var CPU = document.getElementById("CPU").value;
+            var MEMORY = document.getElementById("MEMORY").value;
+            var DISKS = document.getElementById("DISKS").value;
+            var UOM = document.getElementById("UOM").value;
+            var ENABLED_FLAG = document.getElementById("ENABLED_FLAG").value;
+            var CREATION_DATE = document.getElementById("CREATION_DATE").value;
+            var LAST_UPDATE_DATE = document.getElementById("LAST_UPDATE_DATE").value;
+
+            // AJAX request to send data to the server for insertion
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Optionally, you can handle the response from the server
+                    console.log(xhr.responseText);
+                    alert("Form submitted successfully!");
+                    // Clear the form fields after successful insertion
+                    document.getElementById("ITEM_NUMBER").value = '';
+                    document.getElementById("ITEM_DESCRIPTION").value = '';
+                    document.getElementById("ITEM_TYPE").value = '';
+                    document.getElementById("MANUFACTURER_CODE").value = '';
+                    
+                    document.getElementById("ITEM_CATEGORY").value = '';
+                    document.getElementById("CPU").value = '';
+                    document.getElementById("MEMORY").value = '';
+                    document.getElementById("DISKS").value = '';
+                    
+                    document.getElementById("UOM").value = '';
+                    document.getElementById("ENABLED_FLAG").value = '';
+                    
+                    document.getElementById("CREATION_DATE").value = '';
+                    document.getElementById("LAST_UPDATE_DATE").value = '';
+                    
+                }
+            };
+            xhr.open("POST", "/insert_data1", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            // Send data as JSON
+            var data = {
+                "ITEM_NUMBER": ITEM_NUMBER,
+                "ITEM_DESCRIPTION": ITEM_DESCRIPTION,
+                "ITEM_TYPE": ITEM_TYPE,
+                "MANUFACTURER_CODE": MANUFACTURER_CODE,
+                "ITEM_CATEGORY": ITEM_CATEGORY,
+                "CPU": CPU,
+                "MEMORY": MEMORY,
+                "DISKS": DISKS,
+                "UOM": UOM,
+                "ENABLED_FLAG": ENABLED_FLAG,
+                "CREATION_DATE": CREATION_DATE,
+                "LAST_UPDATE_DATE": LAST_UPDATE_DATE,
+            };
+            xhr.send(JSON.stringify(data));
+        }
+        document.getElementById('LAST_UPDATE_DATE').valueAsDate = new Date();
+        document.getElementById('CREATION_DATE').valueAsDate = new Date();
+    </script>
+</body>
+
+</html>

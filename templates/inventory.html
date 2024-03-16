@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* .filters-inventory {
+            /* margin-top: -27px;
+            margin-left: 190px;
+            padding-left: 50px; 
+        } */
+
+        .search {
+            display: flex;
+            /* justify-content: center; */
+            justify-content: space-evenly;
+            margin-bottom: 20px;
+            margin-left: 250px;
+            max-height: 350px;
+            /* box-shadow: 0 5px #888888; */
+            width: 1400px;
+        }
+
+        .pad-15 {
+            padding-top: 48px;
+        }
+
+        .grid1 {
+            display: grid;
+            /* margin-right: 30px; */
+            box-shadow: 1px 1px 1px 1px black;
+            background-color: lightgray;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .search input {
+            width: 300px;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .container1 {
+            /* margin-top: 10px; */
+            margin: 50px;
+            margin-left: 250px;
+            width: 1400px;
+            border: 2px solid black;
+            /* justify-content: space-between; */
+        }
+
+        table,
+        td {
+            border: 1px solid black;
+            /* border-collapse: collapse; */
+            width: 1200px;
+            text-align: center;
+        }
+
+        td {
+            height: 40px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        table {
+            width: 1400px;
+            border: 2px solid black;
+        }
+
+        th {
+            border: 2px solid black;
+            border-collapse: collapse;
+            background-color: lightgray;
+            width: 1200px;
+            /* width: max-content; */
+            height: 40px;
+            text-align: center;
+            /* width:100% */
+            white-space: nowrap;
+            /* color: white; */
+        }
+
+        .matter {
+            overflow-x: scroll;
+            overflow-y: scroll;
+            width: 1400px;
+            /* margin-left: 200px; */
+            height: auto;
+        }
+
+        .button-container {
+            display: flex;
+            /* justify-content: center; */
+            /* Adjust as needed */
+            /* align-items: center; */
+            margin-left: 750px;
+            
+            /* Adjust as needed */
+        }
+
+        .button-container div {
+            margin: 5px;
+        }
+
+        .label-input-pair {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+
+        .label-input-pair label {
+            width: 150px;
+            /* Adjust the width as needed */
+            margin-right: 10px;
+            text-align: left;
+        }
+
+        .label-input-pair input {
+            width: 200px;
+            /* Adjust the width as needed */
+        }
+
+        .add {
+            overflow-y: auto;
+            border: 2px solid black;
+            /* box-shadow: 5px 10px #888880; */
+            border-radius: 10px;
+            width: 600px;
+            display: none;
+            overflow-x: visible;
+            height: 220px;
+            padding: 20px;
+            margin-left: 650px;
+            text-align: center;
+            justify-items: center; 
+            background-color: lightgray;
+            /* display: grid; */
+        }
+        
+        
+        .btn {
+            align-items: center;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="/main">Home</a></li>
+            <li><a href="/item_details">Item Details</a></li>
+            <li><a href="/inventory">Inventory</a></li>
+            <li><a href="/purchase_orders">Purchase Orders</a></li>
+            <li><a href="/lookup_details">Lookup Details</a></li>
+        </ul>
+    </div>
+    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid mb-3 pt-3">
+            <a class="navbar-brand" href="/main">3S TECHNOLOGIES</a>
+            <a class="navbar-brand" href="/main">Home</a>
+            <a class="navbar-brand" href="/logout">Logout</a>
+        </div>
+    </nav>
+    <button class="toggle-btn" onclick="toggleSidebar()">Menu</button>
+    <h3 style="margin-top: 30px; text-align: center;margin-top: -10PX;margin-left: 200PX;font-size: 20PX;">INVENTORY DETAILS</h3>
+    <div class="filters-inventory" id="filters">
+        <div class="box1">
+            <div class="search">
+                <div class="grid1">
+                    <div class="label-input-pair">
+                        <label for="search_inventory_id">Inventory Number:</label>
+                        <input type="text" name="search" id="search_inventory_id">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_install_location">Install Location:</label>
+                        <input type="text" name="search" id="search_install_location">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_project_code">Project Code:</label>
+                        <input type="text" name="search" id="search_project_code">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_quantity">Quantity:</label>
+                        <input type="text" name="search" id="search_quantity">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_ip_address">IP Address:</label>
+                        <input type="text" name="search" id="search_ip_address">
+                    </div>
+                </div>
+
+                <div class="grid1">
+                    <div class="label-input-pair">
+                        <label for="search_subnet_mask">Subnet Mask:</label>
+                        <input type="text" name="search" id="search_subnet_mask">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_gateway">Gateway:</label>
+                        <input type="text" name="search" id="search_gateway">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_comments">Comments:</label>
+                        <input type="text" name="search" id="search_comments">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_last_po_num">Last PO Num:</label>
+                        <input type="text" name="search" id="search_last_po_num">
+                    </div>
+
+                    <div class="label-input-pair">
+                        <label for="search_last_po_price">Last PO Price:</label>
+                        <input type="text" name="search" id="search_last_po_price">
+                    </div>
+                </div>
+                
+            </div>
+            <div class="button-container">
+                <div>
+                    <button onclick="fetchInventory(),toggleSearchBar()" class="button">Search</button>
+                </div>
+                <div>
+                    <button onclick="resetFilters()" class="reset">Reset</button>
+                </div>
+                <form action="/execute1" method="post">
+                    <button class="additem" style="margin: 5px;"> Add Items</button>
+                </form>
+                <form action="/update1" method="post">
+                    <button  style="margin: 5px;">Update</button>
+                </form>
+                <form action="/upload1" method="post">
+                    <button class="additem" style="margin: 5px;"> Import</button>
+                </form>
+                <!-- <button onclick="toggleAddBar()" style="margin: 5px;">Add Items</button> -->
+            </div>
+        </div>
+    </div>
+    <div class="add" style="display: none;">
+        <form>
+            <div class="label-input-pair">
+                <label for="ITEM_NUMBER">Item Number:</label>
+                <input type="text" name="ITEM_NUMBER" id="ITEM_NUMBER">
+            </div>
+            <div class="label-input-pair">
+                <label for="INSTALL_LOCATION">Install Location:</label>
+                <input type="text" name="INSTALL_LOCATION" id="INSTALL_LOCATION">
+            </div>
+            
+            <div class="label-input-pair">
+                <label for="PROJECT_CODE">Project Code:</label>
+                <input type="text" name="PROJECT_CODE" id="PROJECT_CODE">
+            </div>
+            <div class="label-input-pair">
+                <label for="QUANTITY">Quantity:</label>
+                <input type="text" name="QUANTITY" id="QUANTITY">
+            </div>
+            <div class="label-input-pair">
+                <label for="IP_ADDRESS">IP Address:</label>
+                <input type="text" name="IP_ADDRESS" id="IP_ADDRESS">
+            </div>
+            <div class="label-input-pair">
+                <label for="SUBNET_MASK">Subnet Mask:</label>
+                <input type="text" name="SUBNET_MASK" id="SUBNET_MASK">
+            </div>
+            <div class="label-input-pair">
+                <label for="GATEWAY">Gateway:</label>
+                <input type="text" name="GATEWAY" id="GATEWAY">
+            </div>
+            <div class="label-input-pair">
+                <label for="COMMENTS">Comments:</label>
+                <input type="text" name="COMMENTS" id="COMMENTS">
+            </div>
+            <div class="label-input-pair">
+                <label for="LAST_PO_NUM">Last PO Num:</label>
+                <input type="text" name="LAST_PO_NUM" id="LAST_PO_NUM">
+            </div>
+            <!-- <div class="label-input-pair">
+                <label for="ENABLED_FLAG">Enabled Flag:</label>
+                <select id="ENABLED_FLAG" name="ENABLED_FLAG">
+                    <option selected>Choose...</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
+            </div> -->
+            <div class="label-input-pair">
+                <label for="LAST_PO_PRICE">Last PO Price:</label>
+                <input type="text" name="LAST_PO_PRICE" id="LAST_PO_PRICE">
+            </div>
+            <div class="label-input-pair">
+                <label for="RENEWAL_DATE">Renewal Date:</label>
+                <input type="date" name="RENEWAL_DATE" id="RENEWAL_DATE" readonly>
+            </div>
+            <div class="label-input-pair">
+                <label for="NOTES">Notes:</label>
+                <input type="text" name="NOTES" id="NOTES">
+            </div>
+            <div class="label-input-pair">
+                <label for="CREATION_DATE">Creation Date:</label>
+                <input type="date" name="CREATION_DATE" id="CREATION_DATE" readonly>
+            </div>
+            <div class="label-input-pair">
+                <label for="LAST_UPDATE_DATE">Last Update Date:</label>
+                <input type="date" name="LAST_UPDATE_DATE" id="LAST_UPDATE_DATE" readonly>
+            </div>
+            <div class="button-container1">
+                <div>
+                    <button type="button" onclick="submitForm1()" class="button1">Save</button>
+                </div>
+                <div>
+                    <button type="button" onclick="toggleAddBar()" style="margin: 5px;">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="container1">
+        <div id="inventoryDataContainer" class="matter">
+            <table>
+                <tr>
+                    <th>Sno.</th>
+                    <th>INSTALL LOCATION</th>
+                    <th>PROJECT CODE</th>
+                    <th>QUANTITY</th>
+                    <th>IP ADDRESS</th>
+                    <th>SUBNET MASK</th>
+                    <th>GATEWAY</th>
+                    <th>COMMENTS</th>
+                    <th>LAST PO NUM</th>
+                    <th>LAST PO PRICE</th>
+                    <th>RENEWAL DATE</th>
+                    <th>NOTES</th>
+                    <th>CREATION DATE</th>
+                    <th>CREATED BY</th>
+                    <th>LAST UPDATE DATE</th>
+                    <th>LAST UPDATED BY</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/index.js"></script>
+
+    <script>
+        function fetchInventory() {
+            var inventory_id = document.getElementById("search_inventory_id").value;
+            var install_location = document.getElementById("search_install_location").value;
+            var project_code = document.getElementById("search_project_code").value;
+            var quantity = document.getElementById("search_quantity").value;
+            var ip_address = document.getElementById("search_ip_address").value;
+            var subnet_mask = document.getElementById("search_subnet_mask").value;
+            var gateway = document.getElementById("search_gateway").value;
+            var comments = document.getElementById("search_comments").value;
+            var last_po_num = document.getElementById("search_last_po_num").value;
+            var last_po_price = document.getElementById("search_last_po_price").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Update the content of the data container with the fetched item data
+                    document.getElementById("inventoryDataContainer").innerHTML = xhr.responseText;
+                }
+            };
+            var url = `/get_inventory_data?inventory_id=${encodeURIComponent(inventory_id)}&install_location=${encodeURIComponent(install_location)}&project_code=${encodeURIComponent(project_code)}&quantity=${encodeURIComponent(quantity)}&ip_address=${encodeURIComponent(ip_address)}&subnet_mask=${encodeURIComponent(subnet_mask)}&gateway=${encodeURIComponent(gateway)}&comments=${encodeURIComponent(comments)}&last_po_num=${encodeURIComponent(last_po_num)}&last_po_price=${encodeURIComponent(last_po_price)}`;
+            xhr.open("GET", url, true);
+            xhr.send();
+        }
+
+        function toggleSearchBar() {
+            var searchBar = document.querySelector('.search');
+            searchBar.style.display = (searchBar.style.display === 'none') ? 'flex' : 'none';
+        }
+        function resetFilters() {
+            document.getElementById("search_inventory_id").value = "";
+            document.getElementById("search_install_location").value = "";
+            document.getElementById("search_project_code").value = "";
+            document.getElementById("search_quantity").value = "";
+            document.getElementById("search_ip_address").value = "";
+            document.getElementById("search_subnet_mask").value = "";
+            document.getElementById("search_gateway").value = "";
+            document.getElementById("search_comments").value = "";
+            document.getElementById("search_last_po_num").value = "";
+            document.getElementById("search_last_po_price").value = "";
+        }
+        function toggleAddBar() {
+            var addBar = document.querySelector('.add');
+            addBar.style.display = (addBar.style.display === 'none') ? 'flex' : 'none';
+        }
+
+        function submitForm1() {
+            // Get data from the form
+            var ITEM_NUMBER = document.getElementById("ITEM_NUMBER").value;
+            var INSTALL_LOCATION = document.getElementById("INSTALL_LOCATION").value;
+            var PROJECT_CODE = document.getElementById("PROJECT_CODE").value;
+            var QUANTITY = document.getElementById("QUANTITY").value;
+            var IP_ADDRESS = document.getElementById("IP_ADDRESS").value;
+            var SUBNET_MASK = document.getElementById("SUBNET_MASK").value;
+            var GATEWAY = document.getElementById("GATEWAY").value;
+            var COMMENTS = document.getElementById("COMMENTS").value;
+            var LAST_PO_NUM = document.getElementById("LAST_PO_NUM").value;
+            var LAST_PO_PRICE = document.getElementById("LAST_PO_PRICE").value;
+            var RENEWAL_DATE = document.getElementById("RENEWAL_DATE").value;
+            var NOTES = document.getElementById("NOTES").value;
+            var CREATION_DATE = document.getElementById("CREATION_DATE").value;
+            var LAST_UPDATE_DATE = document.getElementById("LAST_UPDATE_DATE").value;
+
+            // AJAX request to send data to the server for insertion
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Optionally, you can handle the response from the server
+                    console.log(xhr.responseText);
+                    alert("Form submitted successfully!");
+                    // Clear the form fields after successful insertion
+                    document.getElementById("ITEM_NUMBER").value = '';
+                    document.getElementById("INSTALL_LOCATION").value = '';
+                    document.getElementById("PROJECT_CODE").value = '';
+                    document.getElementById("QUANTITY").value = '';
+                    document.getElementById("IP_ADDRESS").value = '';
+                    document.getElementById("SUBNET_MASK").value = '';
+                    document.getElementById("GATEWAY").value = '';
+                    document.getElementById("COMMENTS").value = '';
+                    document.getElementById("LAST_PO_NUM").value = '';
+                    document.getElementById("LAST_PO_PRICE").value = '';
+                    document.getElementById("RENEWAL_DATE").value = '';
+                    document.getElementById("NOTES").value = '';
+                    document.getElementById("CREATION_DATE").value = '';
+                    document.getElementById("LAST_UPDATE_DATE").value = '';
+                    
+                }
+            };
+            xhr.open("POST", "/insert_data4", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            // Send data as JSON
+            var data = {
+                "ITEM_NUMBER": ITEM_NUMBER,
+                "INSTALL_LOCATION": INSTALL_LOCATION,
+                "PROJECT_CODE": PROJECT_CODE,
+                "QUANTITY": QUANTITY,
+                "IP_ADDRESS": IP_ADDRESS,
+                "SUBNET_MASK": SUBNET_MASK,
+                "GATEWAY": GATEWAY,
+                "COMMENTS": COMMENTS,
+                "LAST_PO_NUM": LAST_PO_NUM,
+                "LAST_PO_PRICE": LAST_PO_PRICE,
+                "RENEWAL_DATE": RENEWAL_DATE,
+                "NOTES": NOTES,
+                "CREATION_DATE": CREATION_DATE,
+                "LAST_UPDATE_DATE": LAST_UPDATE_DATE,
+            };
+            xhr.send(JSON.stringify(data));
+        }
+
+
+
+
+        document.getElementById('LAST_UPDATE_DATE').valueAsDate = new Date();
+        document.getElementById('RENEWAL_DATE').valueAsDate = new Date();
+        document.getElementById('CREATION_DATE').valueAsDate = new Date();
+    </script>
+    
+</body>
+
+</html>
