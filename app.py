@@ -7,7 +7,7 @@ app.secret_key = 'your_secret_key'  # Change this to a secure secret key
 
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=AJAS-SAMSUNG-BO\MSSQLSERVER01;'
-                      'Database=InfraDb;'
+                      'Database=InfraDB1;'
                       'Trusted_Connection=yes;')
 
 cursor = conn.cursor()
@@ -36,6 +36,10 @@ def lookup_details():
 def register():
     return render_template("register.html")
 
+@app.route("/import_data")
+def import_data():
+    return render_template("import_data.html")
+
 @app.route("/main", methods=["GET", "POST"])
 def main():
     if request.method == "POST":
@@ -45,10 +49,13 @@ def main():
 
     
         # Check the credentials (This is a simple example, not secure for production)
-        cursor.execute("SELECT username,password FROM users WHERE username = ? AND password = ?", (username, password))
+        cursor.execute("SELECT name,username,password FROM users WHERE username = ? AND password = ?", (username, password))
+        
         user = cursor.fetchone()
+        
         if user:
             session['username'] = username  # Store the username in the session
+            session['name'] = user.name
             return redirect(url_for("main"))
         else:
             return render_template("index.html", message="Invalid credentials. Try again.")
@@ -57,6 +64,7 @@ def main():
 def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
+
 
 @app.route("/get_item_data", methods=["GET"])
 def get_item_data():
@@ -155,7 +163,7 @@ def get_inventory_data():
 
     query = 'SELECT INVENTORY_ID, INSTALL_LOCATION, PROJECT_CODE, QUANTITY, IP_ADDRESS, ' \
             'SUBNET_MASK, GATEWAY, COMMENTS, LAST_PO_NUM, LAST_PO_PRICE, RENEWAL_DATE, NOTES, ' \
-            'CREATION_DATE, CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM INVENTORY_ONHAND WHERE 1=1'
+            'CREATION_DATE, CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM INVENTORY_ONHAND1 WHERE 1=1'
 
     conditions = []
 
@@ -216,124 +224,420 @@ def get_inventory_data():
 
     return html_data
 
-@app.route("/get_type_data", methods=["GET"])
-def get_type_data():
-    # Get filter values from request
-    # item_id = request.args.get('item_id', '')
+# @app.route("/get_type_data", methods=["GET"])
+# def get_type_data():
+#     # Get filter values from request
+#     # item_id = request.args.get('item_id', '')
+#     lookup_type_number = request.args.get('lookup_type_number', '')
+#     lookup_type = request.args.get('lookup_type', '')
+#     type_description=request.args.get('type_description','')
+#     enabled_flag = request.args.get('enabled_flag', '')
+    
+#     # Construct SQL query with WHERE conditions
+#     query = 'SELECT LOOKUP_TYPE_ID, LOOKUP_TYPE, TYPE_DESCRIPTION, ENABLED_FLAG, CREATION_DATE, ' \
+#             'CREATED_BY_USER, LAST_UPDATE_DATE, LAST_UPDATED_BY_USER FROM LOOKUP_TYPE WHERE 1=1'
+
+#     conditions = []
+
+#     # if item_id:
+#     #     conditions.append(f"ITEM_ID = '{item_id}'")
+#     if lookup_type_number:
+#         conditions.append(f"LOOKUP_TYPE_ID = '{lookup_type_number}'")
+#     if lookup_type:
+#         conditions.append(f"LOOKUP_TYPE LIKE '%{lookup_type}%'")
+#     if type_description:
+#         conditions.append(f"TYPE_DESCRIPTION LIKE '%{type_description}%'")
+#     if enabled_flag:
+#         conditions.append(f"ENABLED_FLAG = '{enabled_flag}'")    
+#     if conditions:
+#         query += " AND " + " AND ".join(conditions)
+
+#     cursor.execute(query)
+#     data = cursor.fetchall()
+
+#     # Format data as HTML for simplicity (you can use JSON for a more structured approach)
+#     html_data = "<table>\n"
+#     html_data += "<tr>\n"
+#     # html_data += "<th>Edit</th>\n"
+#     html_data += "<th>Type Number</th>\n"
+#     html_data += "<th>Lookup Type</th>\n"
+#     html_data += "<th>Type Description</th>\n"
+#     html_data += "<th>Enabled Flag</th>\n"
+#     html_data += "<th>Creation Date</th>\n"
+#     html_data += "<th>Created By</th>\n"
+#     html_data += "<th>Last Update Date</th>\n"
+#     html_data += "<th>Last Updated By</th>\n"
+
+
+#     html_data += "</tr>\n"
+#     for row in data:
+#         html_data += "<tr>\n"
+#         # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
+#         for item in row:
+#             html_data += "<td>{}</td>\n".format(item)
+#         html_data += "</tr>\n"
+#     html_data += "</table>"
+#     return html_data
+
+# @app.route("/get_value_data", methods=["GET"])
+# def get_value_data():
+#     # Get filter values from request
+#     # item_id = request.args.get('item_id', '')
+#     lookup_type_number1 = request.args.get('lookup_type_number1', '')
+#     lookup_code = request.args.get('lookup_code', '')
+#     lookup_value = request.args.get('lookup_value', '')
+#     value_description=request.args.get('value_description','')
+#     enabled_flag1 = request.args.get('enabled_flag1', '')
+    
+#     # Construct SQL query with WHERE conditions
+#     query = 'SELECT LOOKUP_VALUE_ID, LOOKUP_TYPE_ID, LOOKUP_CODE, LOOKUP_VALUE, VALUE_DESCRIPTION, ' \
+#             'ENABLED_FLAG, CREATION_DATE, CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM LOOKUP_VALUES WHERE 1=1'
+
+#     conditions = []
+
+#     # if item_id:
+#     #     conditions.append(f"ITEM_ID = '{item_id}'")
+#     if lookup_type_number1:
+#         conditions.append(f"LOOKUP_TYPE_ID = '{lookup_type_number1}'")
+#     if lookup_code:
+#         conditions.append(f"LOOKUP_CODE LIKE '%{lookup_code}%'")
+#     if lookup_value:
+#         conditions.append(f"LOOKUP_VALUE LIKE '%{lookup_value}%'")
+#     if value_description:
+#         conditions.append(f"VALUE_DESCRIPTION LIKE '%{value_description}%'")
+#     if enabled_flag1:
+#         conditions.append(f"ENABLED_FLAG = '{enabled_flag1}'")    
+#     if conditions:
+#         query += " AND " + " AND ".join(conditions)
+
+#     cursor.execute(query)
+#     data = cursor.fetchall()
+
+#     # Format data as HTML for simplicity (you can use JSON for a more structured approach)
+#     html_data = "<table>\n"
+#     html_data += "<tr>\n"
+#     html_data += "<th>Sno.</th>\n"
+#     html_data += "<th>Type Number</th>\n"
+#     html_data += "<th>Lookup Code</th>\n"
+#     html_data += "<th>Lookup Value</th>\n"
+#     html_data += "<th>Value Description</th>\n"
+#     html_data += "<th>Enabled Flag</th>\n"
+#     html_data += "<th>Creation Date</th>\n"
+#     html_data += "<th>Created By</th>\n"
+#     html_data += "<th>Last Update Date</th>\n"
+#     html_data += "<th>Last Updated By</th>\n"
+
+
+#     html_data += "</tr>\n"
+#     for row in data:
+#         html_data += "<tr>\n"
+#         # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
+#         for item in row:
+#             html_data += "<td>{}</td>\n".format(item)
+#         html_data += "</tr>\n"
+#     html_data += "</table>"
+#     return html_data
+@app.route("/get_type_and_value_data", methods=["GET"])
+def get_type_and_value_data():
     lookup_type_number = request.args.get('lookup_type_number', '')
     lookup_type = request.args.get('lookup_type', '')
-    type_description=request.args.get('type_description','')
+    type_description = request.args.get('type_description', '')
     enabled_flag = request.args.get('enabled_flag', '')
-    
-    # Construct SQL query with WHERE conditions
-    query = 'SELECT LOOKUP_TYPE_ID, LOOKUP_TYPE, TYPE_DESCRIPTION, ENABLED_FLAG, CREATION_DATE, ' \
-            'CREATED_BY_USER, LAST_UPDATE_DATE, LAST_UPDATED_BY_USER FROM LOOKUP_TYPE WHERE 1=1'
 
-    conditions = []
+    # Construct SQL query with WHERE conditions for parent data
+    query_parent = 'SELECT LOOKUP_TYPE_ID, LOOKUP_TYPE, TYPE_DESCRIPTION, ENABLED_FLAG, CREATION_DATE, ' \
+                   'CREATED_BY_USER, LAST_UPDATE_DATE, LAST_UPDATED_BY_USER FROM LOOKUP_TYPE1 WHERE 1=1'
 
-    # if item_id:
-    #     conditions.append(f"ITEM_ID = '{item_id}'")
+    conditions_parent = []
+
     if lookup_type_number:
-        conditions.append(f"LOOKUP_TYPE_ID = '{lookup_type_number}'")
+        conditions_parent.append(f"LOOKUP_TYPE_ID = '{lookup_type_number}'")
     if lookup_type:
-        conditions.append(f"LOOKUP_TYPE LIKE '%{lookup_type}%'")
+        conditions_parent.append(f"LOOKUP_TYPE LIKE '%{lookup_type}%'")
     if type_description:
-        conditions.append(f"TYPE_DESCRIPTION LIKE '%{type_description}%'")
+        conditions_parent.append(f"TYPE_DESCRIPTION LIKE '%{type_description}%'")
     if enabled_flag:
-        conditions.append(f"ENABLED_FLAG = '{enabled_flag}'")    
-    if conditions:
-        query += " AND " + " AND ".join(conditions)
+        conditions_parent.append(f"ENABLED_FLAG = '{enabled_flag}'")
 
-    cursor.execute(query)
-    data = cursor.fetchall()
+    if conditions_parent:
+        query_parent += " AND " + " AND ".join(conditions_parent)
 
-    # Format data as HTML for simplicity (you can use JSON for a more structured approach)
-    html_data = "<table>\n"
-    html_data += "<tr>\n"
-    # html_data += "<th>Edit</th>\n"
-    html_data += "<th>Type Number</th>\n"
-    html_data += "<th>Lookup Type</th>\n"
-    html_data += "<th>Type Description</th>\n"
-    html_data += "<th>Enabled Flag</th>\n"
-    html_data += "<th>Creation Date</th>\n"
-    html_data += "<th>Created By</th>\n"
-    html_data += "<th>Last Update Date</th>\n"
-    html_data += "<th>Last Updated By</th>\n"
+    cursor.execute(query_parent)
+    parent_data = cursor.fetchone()  # Fetch only the first record
 
+    # Fetch associated child data for the first parent row
+    if parent_data:
+        lookup_type_id = parent_data[0]
+        query_child = f"SELECT LOOKUP_VALUE_ID, LOOKUP_TYPE_ID, LOOKUP_CODE, LOOKUP_VALUE, VALUE_DESCRIPTION, " \
+                      f"ENABLED_FLAG, CREATION_DATE, CREATED_BY_USER, LAST_UPDATE_DATE, " \
+                      f"LAST_UPDATED_BY_USER FROM LOOKUP_VALUES1 WHERE LOOKUP_TYPE_ID = '{lookup_type_id}'"
 
-    html_data += "</tr>\n"
-    for row in data:
-        html_data += "<tr>\n"
-        # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
-        for item in row:
-            html_data += "<td>{}</td>\n".format(item)
-        html_data += "</tr>\n"
-    html_data += "</table>"
+        cursor.execute(query_child)
+        child_data = cursor.fetchall()
+
+        # CSS for table styling
+        table_style = '''
+        <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+        .parent-table {
+            margin-bottom: 20px; /* Add space between parent and child tables */
+        }
+        </style>
+        '''
+
+        # Construct HTML table for parent data
+        parent_table = "<center><h6>Lookup Type</h6></center>"
+        parent_table += "<table class='parent-table'>\n"
+        parent_table += "<tr>\n"
+        parent_table += "<th>Type Number</th>\n"
+        parent_table += "<th>Lookup Type</th>\n"
+        parent_table += "<th>Type Description</th>\n"
+        parent_table += "<th>Enabled Flag</th>\n"
+        parent_table += "<th>Creation Date</th>\n"
+        parent_table += "<th>Created By</th>\n"
+        parent_table += "<th>Last Update Date</th>\n"
+        parent_table += "<th>Last Updated By</th>\n"
+        parent_table += "</tr>\n"
+        parent_table += "<tr>\n"
+        for item in parent_data:
+            parent_table += "<td>{}</td>\n".format(item)
+        parent_table += "</tr>\n"
+        parent_table += "</table>\n"
+
+        # Construct HTML table for child data
+        child_table = "<center><h6>Lookup Value</h6></center>"
+        child_table += "<table>\n"
+        child_table += "<tr>\n"
+        child_table += "<th>Lookup Value ID</th>\n"
+        child_table += "<th>Lookup Type ID</th>\n"
+        child_table += "<th>Lookup Code</th>\n"
+        child_table += "<th>Lookup Value</th>\n"
+        child_table += "<th>Value Description</th>\n"
+        child_table += "<th>Enabled Flag</th>\n"
+        child_table += "<th>Creation Date</th>\n"
+        child_table += "<th>Created By</th>\n"
+        child_table += "<th>Last Update Date</th>\n"
+        child_table += "<th>Last Updated By</th>\n"
+        child_table += "</tr>\n"
+        for row in child_data:
+            child_table += "<tr>\n"
+            for item in row:
+                child_table += "<td>{}</td>\n".format(item)
+            child_table += "</tr>\n"
+        child_table += "</table>\n"
+
+        # Concatenate tables and CSS
+        html_data = table_style + parent_table + child_table
+    else:
+        html_data = "No data found."
+
     return html_data
 
-@app.route("/get_value_data", methods=["GET"])
-def get_value_data():
-    # Get filter values from request
-    # item_id = request.args.get('item_id', '')
-    lookup_type_number1 = request.args.get('lookup_type_number1', '')
-    lookup_code = request.args.get('lookup_code', '')
-    lookup_value = request.args.get('lookup_value', '')
-    value_description=request.args.get('value_description','')
-    enabled_flag1 = request.args.get('enabled_flag1', '')
+
+
+
+# @app.route("/get_header_data", methods=["GET"])
+# def get_header_data():
+#     # Get filter values from request
+#     # item_id = request.args.get('item_id', '')
+#     po_number = request.args.get('po_number', '')
+#     po_type = request.args.get('po_type', '')
+#     po_description = request.args.get('po_description', '')
+#     vendor_name=request.args.get('vendor_name','')
+#     vendor_location = request.args.get('vendor_location', '')
+#     quote_requested = request.args.get('quote_requested', '')
+#     quote_number = request.args.get('quoted_number', '')
+#     po_status = request.args.get('po_status', '')
+#     po_requested = request.args.get('po_requested', '')
+#     invoice_number = request.args.get('invoice_number', '')
+#     invoice_line_number = request.args.get('invoice_line_number', '')
+#     invoice_paid = request.args.get('invoice_paid', '')
+
     
-    # Construct SQL query with WHERE conditions
-    query = 'SELECT LOOKUP_VALUE_ID, LOOKUP_TYPE_ID, LOOKUP_CODE, LOOKUP_VALUE, VALUE_DESCRIPTION, ' \
-            'ENABLED_FLAG, CREATION_DATE, CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM LOOKUP_VALUES WHERE 1=1'
+    
+#     # Construct SQL query with WHERE conditions
+#     query = 'SELECT PO_HEADER_ID, PO_NUMBER, PO_TYPE, PO_DESCRIPTION, VENDOR_NAME, ' \
+#             'VENDOR_LOCATION, QUOTE_REQUESTED, QUOTE_NUMBER,PO_STATUS,PO_DATE,PO_APPROVED_DATE,'\
+#             'PO_APPROVED_BY, PO_REQUESTED,PO_REQUESTED_BY,INVOICE_NUMBER,INVOICE_LINE_NUMBER,INVOICE_AMOUNT,INVOICE_PAID,SUPPORT_START_DATE,SUPPORT_END_DATE,CREATION_DATE,CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM PO_HEADER WHERE 1=1'
 
-    conditions = []
+#     conditions = []
 
-    # if item_id:
-    #     conditions.append(f"ITEM_ID = '{item_id}'")
-    if lookup_type_number1:
-        conditions.append(f"LOOKUP_TYPE_ID = '{lookup_type_number1}'")
-    if lookup_code:
-        conditions.append(f"LOOKUP_CODE LIKE '%{lookup_code}%'")
-    if lookup_value:
-        conditions.append(f"LOOKUP_VALUE LIKE '%{lookup_value}%'")
-    if value_description:
-        conditions.append(f"VALUE_DESCRIPTION LIKE '%{value_description}%'")
-    if enabled_flag1:
-        conditions.append(f"ENABLED_FLAG = '{enabled_flag1}'")    
-    if conditions:
-        query += " AND " + " AND ".join(conditions)
+#     # if item_id:
+#     #     conditions.append(f"ITEM_ID = '{item_id}'")
+#     if po_number:
+#         conditions.append(f"PO_NUMBER = '{po_number}'")
+#     if po_type:
+#         conditions.append(f"PO_TYPE LIKE '%{po_type}%'")
+#     if po_description:
+#         conditions.append(f"PO_DESCRIPTION LIKE '%{po_description}%'")
+#     if vendor_name:
+#         conditions.append(f"VENDOR_NAME LIKE '%{vendor_name}%'")
+#     if vendor_location:
+#         conditions.append(f"VENDOR_LOCATION = '{vendor_location}'")  
+#     if quote_requested:
+#         conditions.append(f"QUOTE_REQUESTED = '{quote_requested}'")  
+#     if quote_number:
+#         conditions.append(f"QUOTE_NUMBER = '{quote_number}'")  
+#     if po_status:
+#         conditions.append(f"PO_STATUS = '{po_status}'")
+#     if po_requested:
+#         conditions.append(f"PO_REQUESTED = '{po_requested}'")  
+#     if invoice_number:
+#         conditions.append(f"INVOICE_NUMBER = '{invoice_number}'")  
+#     if invoice_line_number:
+#         conditions.append(f"INVOICE_LINE_NUMBER = '{invoice_line_number}'")  
+#     if invoice_paid:
+#         conditions.append(f"INVOICE_PAID = '{invoice_paid}'")      
+#     if conditions:
+#         query += " AND " + " AND ".join(conditions)
 
-    cursor.execute(query)
-    data = cursor.fetchall()
+#     cursor.execute(query)
+#     data = cursor.fetchall()
 
-    # Format data as HTML for simplicity (you can use JSON for a more structured approach)
-    html_data = "<table>\n"
-    html_data += "<tr>\n"
-    html_data += "<th>Sno.</th>\n"
-    html_data += "<th>Type Number</th>\n"
-    html_data += "<th>Lookup Code</th>\n"
-    html_data += "<th>Lookup Value</th>\n"
-    html_data += "<th>Value Description</th>\n"
-    html_data += "<th>Enabled Flag</th>\n"
-    html_data += "<th>Creation Date</th>\n"
-    html_data += "<th>Created By</th>\n"
-    html_data += "<th>Last Update Date</th>\n"
-    html_data += "<th>Last Updated By</th>\n"
+#     # Format data as HTML for simplicity (you can use JSON for a more structured approach)
+#     html_data = "<table>\n"
+#     html_data += "<tr>\n"
+#     html_data += "<th>Sno.</th>\n"
+#     html_data += "<th>PO Number</th>\n"
+#     html_data += "<th>PO Type</th>\n"
+#     html_data += "<th>PO Description</th>\n"
+#     html_data += "<th>Vendor Name</th>\n"
+#     html_data += "<th>Vendor Location</th>\n"
+#     html_data += "<th>Quote Requested</th>\n"
+#     html_data += "<th>Quote Number</th>\n"
+#     html_data += "<th>PO Status</th>\n"
+#     html_data += "<th>PO Date</th>\n"
+#     html_data += "<th>PO Approved Date</th>\n"
+#     html_data += "<th>PO Approved By</th>\n"
+#     html_data += "<th>PO Requested</th>\n"
+#     html_data += "<th>PO Requested By</th>\n"
+#     html_data += "<th>Invoice Number</th>\n"
+#     html_data += "<th>Invoice Line Number</th>\n"
+#     html_data += "<th>Invoice Amount</th>\n"
+#     html_data += "<th>Invoice Paid</th>\n"
+#     html_data += "<th>Support Start Date</th>\n"
+#     html_data += "<th>Support End Date</th>\n"
+#     html_data += "<th>Creation Date</th>\n"
+#     html_data += "<th>Created By</th>\n"
+#     html_data += "<th>Last Update Date</th>\n"
+#     html_data += "<th>Last Updated By</th>\n"
 
 
-    html_data += "</tr>\n"
-    for row in data:
-        html_data += "<tr>\n"
-        # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
-        for item in row:
-            html_data += "<td>{}</td>\n".format(item)
-        html_data += "</tr>\n"
-    html_data += "</table>"
-    return html_data
 
-@app.route("/get_header_data", methods=["GET"])
-def get_header_data():
-    # Get filter values from request
-    # item_id = request.args.get('item_id', '')
+#     html_data += "</tr>\n"
+#     for row in data:
+#         html_data += "<tr>\n"
+#         # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
+#         for item in row:
+#             html_data += "<td>{}</td>\n".format(item)
+#         html_data += "</tr>\n"
+#     html_data += "</table>"
+#     return html_data
+
+# @app.route("/get_lines_data", methods=["GET"])
+# def get_lines_data():
+#     # Get filter values from request
+#     # item_id = request.args.get('item_id', '')
+#     po_header_number = request.args.get('po_header_number', '')
+#     po_line_number = request.args.get('po_line_number', '')
+#     item_number = request.args.get('item_number', '')
+#     po_line_description=request.args.get('po_line_description','')
+#     po_line_status = request.args.get('po_line_status', '')
+#     ship_location = request.args.get('ship_location', '')
+#     invoice_number1 = request.args.get('invoice_number1', '')
+#     invoice_line_number1 = request.args.get('invoice_line_number1', '')
+#     invoice_paid1 = request.args.get('invoice_paid1', '')
+#     po_line_comments = request.args.get('po_line_comments', '')
+
+    
+    
+#     # Construct SQL query with WHERE conditions
+#     query = 'SELECT PO_LINE_ID,PO_HEADER_ID, PO_LINE_NUMBER, ITEM_ID, PO_LINE_DESCRIPTION, QUANTITY, ' \
+#             'UNIT_PRICE, LINE_TAX_AMOUNT,SUPPORT_START_DATE,SUPPORT_END_DATE,NEED_BY_DATE,'\
+#             'PO_LINE_STATUS, SHIP_LOCATION,INVOICE_NUMBER,INVOICE_LINE_NUMBER,INVOICE_DATE,INVOICE_PAID,INVOICE_AMOUNT,PO_LINE_COMMENTS,CREATION_DATE,CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM PO_LINES WHERE 1=1'
+
+#     conditions = []
+
+#     # if item_id:
+#     #     conditions.append(f"ITEM_ID = '{item_id}'")
+#     if po_header_number:
+#         conditions.append(f"PO_HEADER_ID = '{po_header_number}'")
+#     if po_line_number:
+#         conditions.append(f"PO_LINE_NUMBER = '{po_line_number}'")
+#     if item_number:
+#         conditions.append(f"ITEM_ID LIKE '%{item_number}%'")
+#     if po_line_description:
+#         conditions.append(f"PO_LINE_DESCRIPTION LIKE '%{po_line_description}%'")
+#     if po_line_status:
+#         conditions.append(f"PO_LINE_STATUS = '{po_line_status}'")  
+#     if ship_location:
+#         conditions.append(f"SHIP_LOCATION = '{ship_location}'")  
+#     if invoice_number1:
+#         conditions.append(f"INVOICE_NUMBER = '{invoice_number1}'")  
+#     if invoice_line_number1:
+#         conditions.append(f"INVOICE_LINE_NUMBER = '{invoice_line_number1}'")
+#     if invoice_paid1:
+#         conditions.append(f"INVOICE_PAID = '{invoice_paid1}'")  
+#     if po_line_comments:
+#         conditions.append(f"PO_LINE_COMMENTS = '{po_line_comments}'")        
+#     if conditions:
+#         query += " AND " + " AND ".join(conditions)
+
+#     cursor.execute(query)
+#     data = cursor.fetchall()
+
+#     # Format data as HTML for simplicity (you can use JSON for a more structured approach)
+#     html_data = "<table>\n"
+#     html_data += "<tr>\n"
+#     html_data += "<th>Sno.</th>\n"
+#     html_data += "<th>PO Header Number</th>\n"
+#     html_data += "<th>PO Line Number</th>\n"
+#     html_data += "<th>Item Number</th>\n"
+#     html_data += "<th>PO Line Description</th>\n"
+#     html_data += "<th>Quantity</th>\n"
+#     html_data += "<th>Unit Price</th>\n"
+#     html_data += "<th>Line Tax Amount</th>\n"
+#     html_data += "<th>Support Start Date</th>\n"
+#     html_data += "<th>Support End Date</th>\n"
+#     html_data += "<th>Need By Date</th>\n"
+#     html_data += "<th>PO Line Status</th>\n"
+#     html_data += "<th>Ship Location</th>\n"
+#     html_data += "<th>Invoice Number</th>\n"
+#     html_data += "<th>Invoice Line Number</th>\n"
+#     html_data += "<th>Invoice Date</th>\n"
+#     html_data += "<th>Invoice Paid</th>\n"
+#     html_data += "<th>Invoice Amount</th>\n"
+#     html_data += "<th>PO Line Comments</th>\n"
+#     html_data += "<th>Creation Date</th>\n"
+#     html_data += "<th>Created By</th>\n"
+#     html_data += "<th>Last Update Date</th>\n"
+#     html_data += "<th>Last Updated By</th>\n"
+#     html_data += "</tr>\n"
+#     for row in data:
+#         html_data += "<tr>\n"
+#         # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
+#         for item in row:
+#             html_data += "<td>{}</td>\n".format(item)
+#         html_data += "</tr>\n"
+#     html_data += "</table>"
+#     return html_data
+
+
+@app.route("/get_po_data", methods=["GET"])
+def get_po_data():
+    # Get filter values from request for PO Header
+    po_header = request.args.get('po_header', '')
     po_number = request.args.get('po_number', '')
     po_type = request.args.get('po_type', '')
     po_description = request.args.get('po_description', '')
@@ -347,174 +651,159 @@ def get_header_data():
     invoice_line_number = request.args.get('invoice_line_number', '')
     invoice_paid = request.args.get('invoice_paid', '')
 
-    
-    
-    # Construct SQL query with WHERE conditions
-    query = 'SELECT PO_HEADER_ID, PO_NUMBER, PO_TYPE, PO_DESCRIPTION, VENDOR_NAME, ' \
+
+    # Construct SQL query with WHERE conditions for PO Header
+    query_header = 'SELECT PO_HEADER_ID, PO_NUMBER, PO_TYPE, PO_DESCRIPTION, VENDOR_NAME, ' \
             'VENDOR_LOCATION, QUOTE_REQUESTED, QUOTE_NUMBER,PO_STATUS,PO_DATE,PO_APPROVED_DATE,'\
-            'PO_APPROVED_BY, PO_REQUESTED,PO_REQUESTED_BY,INVOICE_NUMBER,INVOICE_LINE_NUMBER,INVOICE_AMOUNT,INVOICE_PAID,SUPPORT_START_DATE,SUPPORT_END_DATE,CREATION_DATE,CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM PO_HEADER WHERE 1=1'
+            'PO_APPROVED_BY, PO_REQUESTED,PO_REQUESTED_BY,INVOICE_NUMBER,INVOICE_LINE_NUMBER,INVOICE_AMOUNT,INVOICE_PAID,SUPPORT_START_DATE,SUPPORT_END_DATE,CREATION_DATE,CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM PO_HEADER1 WHERE 1=1'
 
-    conditions = []
+    conditions_header = []
 
-    # if item_id:
-    #     conditions.append(f"ITEM_ID = '{item_id}'")
+    if po_header:
+        conditions_header.append(f"PO_HEADER_ID = '{po_header}'")
     if po_number:
-        conditions.append(f"PO_NUMBER = '{po_number}'")
+        conditions_header.append(f"PO_NUMBER = '{po_number}'")
     if po_type:
-        conditions.append(f"PO_TYPE LIKE '%{po_type}%'")
+        conditions_header.append(f"PO_TYPE LIKE '%{po_type}%'")
     if po_description:
-        conditions.append(f"PO_DESCRIPTION LIKE '%{po_description}%'")
+        conditions_header.append(f"PO_DESCRIPTION LIKE '%{po_description}%'")
     if vendor_name:
-        conditions.append(f"VENDOR_NAME LIKE '%{vendor_name}%'")
+        conditions_header.append(f"VENDOR_NAME LIKE '%{vendor_name}%'")
     if vendor_location:
-        conditions.append(f"VENDOR_LOCATION = '{vendor_location}'")  
+        conditions_header.append(f"VENDOR_LOCATION = '{vendor_location}'")  
     if quote_requested:
-        conditions.append(f"QUOTE_REQUESTED = '{quote_requested}'")  
+        conditions_header.append(f"QUOTE_REQUESTED = '{quote_requested}'")  
     if quote_number:
-        conditions.append(f"QUOTE_NUMBER = '{quote_number}'")  
+        conditions_header.append(f"QUOTE_NUMBER = '{quote_number}'")  
     if po_status:
-        conditions.append(f"PO_STATUS = '{po_status}'")
+        conditions_header.append(f"PO_STATUS = '{po_status}'")
     if po_requested:
-        conditions.append(f"PO_REQUESTED = '{po_requested}'")  
+        conditions_header.append(f"PO_REQUESTED = '{po_requested}'")  
     if invoice_number:
-        conditions.append(f"INVOICE_NUMBER = '{invoice_number}'")  
+        conditions_header.append(f"INVOICE_NUMBER = '{invoice_number}'")  
     if invoice_line_number:
-        conditions.append(f"INVOICE_LINE_NUMBER = '{invoice_line_number}'")  
+        conditions_header.append(f"INVOICE_LINE_NUMBER = '{invoice_line_number}'")  
     if invoice_paid:
-        conditions.append(f"INVOICE_PAID = '{invoice_paid}'")      
-    if conditions:
-        query += " AND " + " AND ".join(conditions)
+        conditions_header.append(f"INVOICE_PAID = '{invoice_paid}'")      
+    if conditions_header:
+        query_header += " AND " + " AND ".join(conditions_header)
 
-    cursor.execute(query)
-    data = cursor.fetchall()
-
-    # Format data as HTML for simplicity (you can use JSON for a more structured approach)
-    html_data = "<table>\n"
-    html_data += "<tr>\n"
-    html_data += "<th>Sno.</th>\n"
-    html_data += "<th>PO Number</th>\n"
-    html_data += "<th>PO Type</th>\n"
-    html_data += "<th>PO Description</th>\n"
-    html_data += "<th>Vendor Name</th>\n"
-    html_data += "<th>Vendor Location</th>\n"
-    html_data += "<th>Quote Requested</th>\n"
-    html_data += "<th>Quote Number</th>\n"
-    html_data += "<th>PO Status</th>\n"
-    html_data += "<th>PO Date</th>\n"
-    html_data += "<th>PO Approved Date</th>\n"
-    html_data += "<th>PO Approved By</th>\n"
-    html_data += "<th>PO Requested</th>\n"
-    html_data += "<th>PO Requested By</th>\n"
-    html_data += "<th>Invoice Number</th>\n"
-    html_data += "<th>Invoice Line Number</th>\n"
-    html_data += "<th>Invoice Amount</th>\n"
-    html_data += "<th>Invoice Paid</th>\n"
-    html_data += "<th>Support Start Date</th>\n"
-    html_data += "<th>Support End Date</th>\n"
-    html_data += "<th>Creation Date</th>\n"
-    html_data += "<th>Created By</th>\n"
-    html_data += "<th>Last Update Date</th>\n"
-    html_data += "<th>Last Updated By</th>\n"
-
-
-
-    html_data += "</tr>\n"
-    for row in data:
-        html_data += "<tr>\n"
-        # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
-        for item in row:
-            html_data += "<td>{}</td>\n".format(item)
-        html_data += "</tr>\n"
-    html_data += "</table>"
-    return html_data
-
-@app.route("/get_lines_data", methods=["GET"])
-def get_lines_data():
-    # Get filter values from request
-    # item_id = request.args.get('item_id', '')
-    po_header_number = request.args.get('po_header_number', '')
-    po_line_number = request.args.get('po_line_number', '')
-    item_number = request.args.get('item_number', '')
-    po_line_description=request.args.get('po_line_description','')
-    po_line_status = request.args.get('po_line_status', '')
-    ship_location = request.args.get('ship_location', '')
-    invoice_number1 = request.args.get('invoice_number1', '')
-    invoice_line_number1 = request.args.get('invoice_line_number1', '')
-    invoice_paid1 = request.args.get('invoice_paid1', '')
-    po_line_comments = request.args.get('po_line_comments', '')
+    cursor.execute(query_header)
+    header_data = cursor.fetchone()  # Fetch only the first record for PO Header
 
     
-    
-    # Construct SQL query with WHERE conditions
-    query = 'SELECT PO_LINE_ID,PO_HEADER_ID, PO_LINE_NUMBER, ITEM_ID, PO_LINE_DESCRIPTION, QUANTITY, ' \
-            'UNIT_PRICE, LINE_TAX_AMOUNT,SUPPORT_START_DATE,SUPPORT_END_DATE,NEED_BY_DATE,'\
-            'PO_LINE_STATUS, SHIP_LOCATION,INVOICE_NUMBER,INVOICE_LINE_NUMBER,INVOICE_DATE,INVOICE_PAID,INVOICE_AMOUNT,PO_LINE_COMMENTS,CREATION_DATE,CREATED_BY_USER,LAST_UPDATE_DATE,LAST_UPDATED_BY_USER FROM PO_LINES WHERE 1=1'
+    # Fetch associated child records based on the PO_HEADER_ID from the parent record
+    if header_data:
+        po_header_id=header_data[0]
+        query_lines = f"SELECT PO_LINE_ID, PO_HEADER_ID, PO_LINE_NUMBER, ITEM_ID, PO_LINE_DESCRIPTION, QUANTITY, UNIT_PRICE,"\
+    f"LINE_TAX_AMOUNT, SUPPORT_START_DATE, SUPPORT_END_DATE, NEED_BY_DATE, PO_LINE_STATUS, SHIP_LOCATION,"\
+    f"INVOICE_NUMBER, INVOICE_LINE_NUMBER, INVOICE_DATE, INVOICE_PAID, INVOICE_AMOUNT, PO_LINE_COMMENTS,"\
+    f"CREATION_DATE, CREATED_BY_USER, LAST_UPDATE_DATE, LAST_UPDATED_BY_USER FROM PO_LINES1 WHERE PO_HEADER_ID ='{po_header_id}'"  # Assuming the PO_HEADER_ID is the first column in header_data
 
-    conditions = []
 
-    # if item_id:
-    #     conditions.append(f"ITEM_ID = '{item_id}'")
-    if po_header_number:
-        conditions.append(f"PO_HEADER_ID = '{po_header_number}'")
-    if po_line_number:
-        conditions.append(f"PO_LINE_NUMBER = '{po_line_number}'")
-    if item_number:
-        conditions.append(f"ITEM_ID LIKE '%{item_number}%'")
-    if po_line_description:
-        conditions.append(f"PO_LINE_DESCRIPTION LIKE '%{po_line_description}%'")
-    if po_line_status:
-        conditions.append(f"PO_LINE_STATUS = '{po_line_status}'")  
-    if ship_location:
-        conditions.append(f"SHIP_LOCATION = '{ship_location}'")  
-    if invoice_number1:
-        conditions.append(f"INVOICE_NUMBER = '{invoice_number1}'")  
-    if invoice_line_number1:
-        conditions.append(f"INVOICE_LINE_NUMBER = '{invoice_line_number1}'")
-    if invoice_paid1:
-        conditions.append(f"INVOICE_PAID = '{invoice_paid1}'")  
-    if po_line_comments:
-        conditions.append(f"PO_LINE_COMMENTS = '{po_line_comments}'")        
-    if conditions:
-        query += " AND " + " AND ".join(conditions)
+    cursor.execute(query_lines)
+    lines_data = cursor.fetchone()  # Fetch only the first record for PO Lines
 
-    cursor.execute(query)
-    data = cursor.fetchall()
+    # CSS for table styling
+    table_style = '''
+    <style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    tr:hover {
+        background-color: #f2f2f2;
+    }
+    .parent-table {
+        margin-bottom: 20px; /* Add space between parent and child tables */
+    }
+    </style>
+    '''
 
-    # Format data as HTML for simplicity (you can use JSON for a more structured approach)
-    html_data = "<table>\n"
-    html_data += "<tr>\n"
-    html_data += "<th>Sno.</th>\n"
-    html_data += "<th>PO Header Number</th>\n"
-    html_data += "<th>PO Line Number</th>\n"
-    html_data += "<th>Item Number</th>\n"
-    html_data += "<th>PO Line Description</th>\n"
-    html_data += "<th>Quantity</th>\n"
-    html_data += "<th>Unit Price</th>\n"
-    html_data += "<th>Line Tax Amount</th>\n"
-    html_data += "<th>Support Start Date</th>\n"
-    html_data += "<th>Support End Date</th>\n"
-    html_data += "<th>Need By Date</th>\n"
-    html_data += "<th>PO Line Status</th>\n"
-    html_data += "<th>Ship Location</th>\n"
-    html_data += "<th>Invoice Number</th>\n"
-    html_data += "<th>Invoice Line Number</th>\n"
-    html_data += "<th>Invoice Date</th>\n"
-    html_data += "<th>Invoice Paid</th>\n"
-    html_data += "<th>Invoice Amount</th>\n"
-    html_data += "<th>PO Line Comments</th>\n"
-    html_data += "<th>Creation Date</th>\n"
-    html_data += "<th>Created By</th>\n"
-    html_data += "<th>Last Update Date</th>\n"
-    html_data += "<th>Last Updated By</th>\n"
-    html_data += "</tr>\n"
-    for row in data:
-        html_data += "<tr>\n"
-        # html_data += "<td><button><i class='fa-solid fa-pencil'></i></button></td>\n"
-        for item in row:
-            html_data += "<td>{}</td>\n".format(item)
-        html_data += "</tr>\n"
-    html_data += "</table>"
+    # Construct HTML table for PO Header data
+    header_table = "<center><h6>PO HEADER</h6></center>"
+    header_table += "<table class='parent-table'>\n"
+    header_table += "<tr>\n"
+    header_table += "<th>Sno.</th>\n"
+    header_table += "<th>PONumber</th>\n"
+    header_table += "<th>Type</th>\n"
+    header_table += "<th>Description</th>\n"
+    header_table += "<th>Vendor Name</th>\n"
+    header_table += "<th>Vendor Location</th>\n"
+    header_table += "<th>Quote Requested</th>\n"
+    header_table += "<th>Quote Number</th>\n"
+    header_table += "<th>Status</th>\n"
+    header_table += "<th>PO Date</th>\n"
+    header_table += "<th>PO Approved Date</th>\n"
+    header_table += "<th>PO Approved By</th>\n"
+    header_table += "<th>PO Requested</th>\n"
+    header_table += "<th>PO Requested By</th>\n"
+    header_table += "<th>Invoice Number</th>\n"
+    header_table += "<th>Invoice Line Number</th>\n"
+    header_table += "<th>Invoice Amount</th>\n"
+    header_table += "<th>Invoice Paid</th>\n"
+    header_table += "<th>Support Start Date</th>\n"
+    header_table += "<th>Support End Date</th>\n"
+    header_table += "<th>Creation Date</th>\n"
+    header_table += "<th>Created By</th>\n"
+    header_table += "<th>Last Update Date</th>\n"
+    header_table += "<th>Last Updated By</th>\n"
+    header_table += "</tr>\n"
+    if header_data:
+        header_table += "<tr>\n"
+        for item in header_data:
+            header_table += "<td>{}</td>\n".format(item)
+        header_table += "</tr>\n"
+    header_table += "</table>\n"
+
+    # Construct HTML table for PO Lines data
+    lines_table ="<center><h6>PO LINES</h6></center>"
+    lines_table += "<table>\n"
+    lines_table += "<tr>\n"
+    lines_table += "<th>Sno.</th>\n"
+    lines_table += "<th>Header Number</th>\n"
+    lines_table += "<th>Line Number</th>\n"
+    lines_table += "<th>Item Number</th>\n"
+    lines_table += "<th>Line Description</th>\n"
+    lines_table += "<th>Quantity</th>\n"
+    lines_table += "<th>Unit Price</th>\n"
+    lines_table += "<th>Line Tax Amount</th>\n"
+    lines_table += "<th>Support Start Date</th>\n"
+    lines_table += "<th>Support End Date</th>\n"
+    lines_table += "<th>Need By Date</th>\n"
+    lines_table += "<th>Line Status</th>\n"
+    lines_table += "<th>Ship Location</th>\n"
+    lines_table += "<th>Invoice Number</th>\n"
+    lines_table += "<th>Invoice Line Number</th>\n"
+    lines_table += "<th>Invoice Date</th>\n"
+    lines_table += "<th>Invoice Paid</th>\n"
+    lines_table += "<th>Invoice Amount</th>\n"
+    lines_table += "<th>Line Comments</th>\n"
+    lines_table += "<th>Creation Date</th>\n"
+    lines_table += "<th>Created By</th>\n"
+    lines_table += "<th>Last Update Date</th>\n"
+    lines_table += "<th>Last Updated By</th>\n"
+    lines_table += "</tr>\n"
+    if lines_data:
+        lines_table += "<tr>\n"
+        for item in lines_data:
+            lines_table += "<td>{}</td>\n".format(item)
+        lines_table += "</tr>\n"
+    lines_table += "</table>\n"
+
+    # Concatenate tables and CSS
+    html_data = table_style + header_table + lines_table
+
     return html_data
+
+
+
+
 
 
 #all Add items present here
@@ -522,7 +811,7 @@ def get_lines_data():
 @app.route('/execute', methods=['POST'])
 def execute():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "insert_item_master.py", username])
         return render_template("item_details.html")
     except Exception as e:
@@ -533,7 +822,7 @@ def execute():
 @app.route('/execute1',methods=['POST'])
 def execute1():
     try:
-        username = session.get('username', '') 
+        username = session.get('name', '') 
         subprocess.run(["python","insert_inventory.py",username])
         return render_template("inventory.html")
     except Exception as e:
@@ -543,7 +832,7 @@ def execute1():
 @app.route('/execute2', methods=['POST'])
 def execute2():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Insert_Loookup_Type.py", username])
         return render_template("lookup_details.html")
     except Exception as e:
@@ -552,7 +841,7 @@ def execute2():
 @app.route('/execute3', methods=['POST'])
 def execute3():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Insert_Lookup_Values.py", username])
         return render_template("lookup_details.html")
     except Exception as e:
@@ -562,7 +851,7 @@ def execute3():
 @app.route('/execute4', methods=['POST'])
 def execute4():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Insert_PO_Header.py", username])
         return render_template("purchase_orders.html")
     except Exception as e:
@@ -572,7 +861,7 @@ def execute4():
 @app.route('/execute5', methods=['POST'])
 def execute5():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Insert_PO_Lines.py", username])
         return render_template("purchase_orders.html")
     except Exception as e:
@@ -584,7 +873,7 @@ def execute5():
 @app.route('/update', methods=['POST'])
 def update():
     try:
-        username = session.get('username', '')
+        username = session.get('name', '')
         subprocess.run(["python", "Modify_Item_Master.py", username])
         return render_template("item_details.html")
     except Exception as e:
@@ -595,7 +884,7 @@ def update():
 @app.route('/update1', methods=['POST'])
 def update1():
     try:
-        username = session.get('username', '')
+        username = session.get('name', '')
         subprocess.run(["python", "Modify_Inventory_On_Hand.py", username])
         return render_template("inventory.html")
     except Exception as e:
@@ -605,7 +894,7 @@ def update1():
 @app.route('/update2', methods=['POST'])
 def update2():
     try:
-        username = session.get('username', '')
+        username = session.get('name', '')
         subprocess.run(["python", "Modify_Lookup_Type.py", username])
         return render_template("lookup_details.html")
     except Exception as e:
@@ -615,7 +904,7 @@ def update2():
 @app.route('/update3', methods=['POST'])
 def update3():
     try:
-        username = session.get('username', '')
+        username = session.get('name', '')
         subprocess.run(["python", "Moidfy_Lookup_Values.py", username])
         return render_template("lookup_details.html")
     except Exception as e:
@@ -625,7 +914,7 @@ def update3():
 @app.route('/update4', methods=['POST'])
 def update4():
     try:
-        username = session.get('username', '')
+        username = session.get('name', '')
         subprocess.run(["python", "Modify_PO_Header.py", username])
         return render_template("purchase_orders.html")
     except Exception as e:
@@ -635,7 +924,7 @@ def update4():
 @app.route('/update5', methods=['POST'])
 def update5():
     try:
-        username = session.get('username', '')
+        username = session.get('name', '')
         subprocess.run(["python", "Modify_PO_Lines.py", username])
         return render_template("purchase_orders.html")
     except Exception as e:
@@ -648,8 +937,8 @@ def update5():
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
-        username = session.get('username', '')  # Get the username from the session
-        subprocess.run(["python", "import_ITEM_MASTER.py", username])
+        username = session.get('name', '')  # Get the username from the session
+        subprocess.run(["python", "import_ITEM_MASTER.py", str(username)])
         return render_template("item_details.html")
     except Exception as e:
          return f"Error during execution: {str(e)}"
@@ -659,7 +948,7 @@ def upload():
 @app.route('/upload1', methods=['POST'])
 def upload1():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Import_Inventory_On_hand.py", username])
         return render_template("inventory.html")
     except Exception as e:
@@ -668,7 +957,7 @@ def upload1():
 @app.route('/upload2', methods=['POST'])
 def upload2():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Import_Lookup_Type.py", username])
         return render_template("lookup_details.html")
     except Exception as e:
@@ -677,7 +966,7 @@ def upload2():
 @app.route('/upload3', methods=['POST'])
 def upload3():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Import_Lookup_Values.py", username])
         return render_template("lookup_details.html")
     except Exception as e:
@@ -686,7 +975,7 @@ def upload3():
 @app.route('/upload4', methods=['POST'])
 def upload4():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Import_PO_Header.py", username])
         return render_template("purchase_orders.html")
     except Exception as e:
@@ -695,7 +984,7 @@ def upload4():
 @app.route('/upload5', methods=['POST'])
 def upload5():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "Import_PO_Lines.py", username])
         return render_template("purchase_orders.html")
     except Exception as e:
@@ -706,34 +995,13 @@ def upload5():
 @app.route('/extract', methods=['POST'])
 def extract():
     try:
-        username = session.get('username', '')  # Get the username from the session
+        username = session.get('name', '')  # Get the username from the session
         subprocess.run(["python", "export_ITEM_MASTER.py", username])
-        return render_template("item_details.html")
+        return render_template("item_details.html",message="Exported Successfully...!")
     except Exception as e:
          return f"Error during execution: {str(e)}"
 
 
-# @app.route("/insert_data", methods=["POST"])
-# def insert_data():
-#     try:
-#         # Receive data from the client
-#         data = request.get_json()
-#         # Extract data fields
-#         # name = data.get("name")
-#         username = data.get("username")
-#         email = data.get("email")
-#         password = data.get("password")
-#         phonenumber = data.get("phonenumber")
-        
-#         # Execute your SQL query to insert data into the database
-#         cursor.execute("INSERT INTO Users ( username, email, password,phonenumber) VALUES (?, ?, ?, ?);",
-#                        (username, email, phonenumber,password))
-#         conn.commit()
-
-#         return jsonify({"message": "registered successfully"})
-    
-#     except Exception as e:
-#         return jsonify({"error": str(e)})
 @app.route("/insert_data", methods=["POST"])
 def insert_data():
     try:
@@ -747,7 +1015,7 @@ def insert_data():
         password = data.get("password")
         
         # Execute your SQL query to insert data into the database
-        cursor.execute("INSERT INTO users (name, email, phonenumber, username, password) VALUES (?, ?, ?, ?, ?);",
+        cursor.execute("INSERT INTO users1 (name, email, phonenumber, username, password) VALUES (?, ?, ?, ?, ?);",
                        (name, email, phonenumber, username, password));
         conn.commit()
 
@@ -755,8 +1023,6 @@ def insert_data():
     
     except Exception as e:
         return jsonify({"error": str(e)})
-
-
 
 @app.route("/insert_data1", methods=["POST"])
 def insert_data1():
