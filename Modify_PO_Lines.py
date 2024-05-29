@@ -6,10 +6,10 @@ import sys
 
 app = tk.Tk()
 app.geometry("700x500")
-app.title("MODIFY PO LINES")
+app.title("MODIFY LOOKUP VALUES")
 
 # Label above the frame
-instruction_label = ttk.Label(app, text="ENTER THE PO HEADER NUMBER TO FETCH THE DATA" , foreground="black", font=font.Font(size=11), background="#CCCCCC")
+instruction_label = ttk.Label(app, text="ENTER THE SERIAL NUMBER TO FETCH THE DATA" , foreground="black", font=font.Font(size=11), background="#CCCCCC")
 instruction_label.place(relx=0.1, rely=0.1)
 
 
@@ -34,40 +34,28 @@ canvas.pack(side="left", fill="both", expand=True)
 scrollbar.pack(side="right", fill="y")
 
 
+# Function to add labels and entry fields to the scrollable frame
 def add_label_and_entry(label_text, row):
     label = ttk.Label(scrollable_frame, text=label_text)
     label.grid(row=row, column=0, sticky='w', padx=10, pady=5)  # Adjusted padx and pady for spacing
 
-    entry = ttk.Entry(scrollable_frame)  # Default to Entry widget for all fields
-    if label_text == "PO_HEADER_ID:":
-        # Making PO_HEADER_ID readonly
-        entry.config(state="writeonly")  
+    if label_text == "ENABLED FLAG:":
+        entry = ttk.Combobox(scrollable_frame, values=['Y', 'N'])
+    else:
+        entry = ttk.Entry(scrollable_frame)
+        
     entry.grid(row=row, column=1, padx=10, pady=5)  # Adjusted padx and pady for spacing
     return entry
 
-
 # Labels and entry fields
 labels_and_entries = [
-    ("PO HEADER NUMBER:", 0),
-    ("PO LINE NUMBER:", 1),
-    ("ITEM ID:", 2),
-    ("PO LINE DESCRIPTION:", 3),
-    ("QUANTITY:", 4),
-    ("UNIT PRICE:", 5),
-    ("LINE TAX AMOUNT:", 6),
-    ("SUPPORT START DATE:", 7),
-    ("SUPPORT END DATE:", 8),
-    ("NEED BY DATE:", 9),
-    ("PO LINE STATUS:", 10),
-    ("SHIP LOCATION:", 11),
-    ("INVOICE NUMBER:", 12),
-    ("INVOICE LINE NUMBER:", 13),
-    ("INVOICE DATE:", 14),
-    ("INVOICE PAID:", 15),
-    ("INVOICE AMOUNT:", 16),
-    ("PO LINE COMMENTS:", 17)
+    ("S.No:", 0),
+    ("TYPE NUMBER:", 1),
+    ("LOOKUP CODE", 2),
+    ("LOOKUP VALUE:", 3),
+    ("VALUE DESCRIPTION", 4),
+    ("ENABLED FLAG:",5)
 ]
-
 
 entry_fields = []
 for label_text, row in labels_and_entries:
@@ -75,62 +63,51 @@ for label_text, row in labels_and_entries:
     entry_fields.append(entry)
 
 def fetch_lookup_data(event=None):
-    po_header_id = entry_fields[0].get()  # Assuming the PO_HEADER_ID entry field is the first one
-    if po_header_id:  # Check if po_header_id is not empty
+    lookup_value_id = entry_fields[0].get()  # Assuming the LOOKUP_TYPE_ID entry field is the first one
+    if lookup_value_id:  # Check if lookup_type_id is not empty
         try:
             connection = pyodbc.connect('Driver={SQL Server};'
-                            'Server=AJAS-SAMSUNG-BO\MSSQLSERVER01;'
+                           'Server=AJAS-SAMSUNG-BO\MSSQLSERVER01;'
                       'Database=InfraDB1;'
                             'Trusted_Connection=yes;')
             cursor = connection.cursor()
 
-            # Execute SQL query to fetch data based on PO_HEADER_ID
-            cursor.execute("SELECT PO_LINE_NUMBER, ITEM_ID, PO_LINE_DESCRIPTION, QUANTITY, UNIT_PRICE, LINE_TAX_AMOUNT, SUPPORT_START_DATE, SUPPORT_END_DATE, NEED_BY_DATE, PO_LINE_STATUS, SHIP_LOCATION, INVOICE_NUMBER, INVOICE_LINE_NUMBER, INVOICE_DATE, INVOICE_PAID, INVOICE_AMOUNT, PO_LINE_COMMENTS FROM PO_LINES WHERE PO_HEADER_ID = ?", (po_header_id,))
+            # Execute SQL query to fetch data based on LOOKUP_TYPE_ID
+            cursor.execute("SELECT LOOKUP_TYPE_ID, LOOKUP_CODE, LOOKUP_VALUE, VALUE_DESCRIPTION, ENABLED_FLAG FROM Lookup_Values WHERE LOOKUP_VALUE_ID = ?", (lookup_value_id,))
+
             row = cursor.fetchone()
 
-            # If data is found and PO_LINE_NUMBER has not been fetched yet, populate the entry fields
-            if row and not entry_fields[1].get():
-                po_line_number, item_id, po_line_description, quantity, unit_price, line_tax_amount, support_start_date, support_end_date, need_by_date, po_line_status, ship_location, invoice_number, invoice_line_number, invoice_date, invoice_paid, invoice_amount, po_line_comments = row
-                entry_fields[1].insert(0, po_line_number)  # Populate PO_LINE_NUMBER
-                entry_fields[2].insert(0, item_id)  # Populate ITEM_ID
-                entry_fields[3].insert(0, po_line_description)  # Populate PO_LINE_DESCRIPTION
-                entry_fields[4].insert(0, quantity)  # Populate QUANTITY
-                entry_fields[5].insert(0, unit_price)  # Populate UNIT_PRICE
-                entry_fields[6].insert(0, line_tax_amount)  # Populate LINE_TAX_AMOUNT
-                entry_fields[7].insert(0, support_start_date)  # Populate SUPPORT_START_DATE
-                entry_fields[8].insert(0, support_end_date)  # Populate SUPPORT_END_DATE
-                entry_fields[9].insert(0, need_by_date)  # Populate NEED_BY_DATE
-                entry_fields[10].insert(0, po_line_status)  # Populate PO_LINE_STATUS
-                entry_fields[11].insert(0, ship_location)  # Populate SHIP_LOCATION
-                entry_fields[12].insert(0, invoice_number)  # Populate INVOICE_NUMBER
-                entry_fields[13].insert(0, invoice_line_number)  # Populate INVOICE_LINE_NUMBER
-                entry_fields[14].insert(0, invoice_date)  # Populate INVOICE_DATE
-                entry_fields[15].insert(0, invoice_paid)  # Populate INVOICE_PAID
-                entry_fields[16].insert(0, invoice_amount)  # Populate INVOICE_AMOUNT
-                entry_fields[17].insert(0, po_line_comments)  # Populate PO_LINE_COMMENTS
+            # If data is found and LOOKUP_VALUE has not been fetched yet, populate the entry fields
+            if row and not entry_fields[2].get():
+                lookup_type_id, lookup_code, lookup_value, value_description, enabled_flag = row
+                entry_fields[1].insert(0, lookup_type_id)
+                entry_fields[2].insert(0, lookup_code)  # Populate LOOKUP_CODE
+                entry_fields[3].insert(0, lookup_value)  # Populate LOOKUP_VALUE
+                entry_fields[4].insert(0, value_description)  # Populate VALUE_DESCRIPTION
+                entry_fields[5].set(enabled_flag)  # Set the value of ENABLED_FLAG ComboBox
                 data_found_label = ttk.Label(scrollable_frame, text="   Data found   ", foreground="green")
-                data_found_label.grid(row=0, column=19, padx=(10, 0), pady=5)
+                data_found_label.grid(row=0, column=5, padx=(10, 0), pady=5)
             elif not row:
-                # Show "data not found" if PO_HEADER_ID doesn't exist
+                # Show "data not found" if lookup type doesn't exist
                 data_not_found_label = ttk.Label(scrollable_frame, text="Data not found", foreground="red")
-                data_not_found_label.grid(row=0, column=19, padx=(10, 0), pady=5)
+                data_not_found_label.grid(row=0, column=5, padx=(10, 0), pady=5)
 
         except pyodbc.Error as ex:
             print("ERROR:", ex)
 
 
-# Bind fetch_lookup_data function to the PO_HEADER_ID entry field
+# Bind fetch_lookup_data function to the LOOKUP_TYPE_ID entry field
 entry_fields[0].bind("<FocusOut>", fetch_lookup_data)
 
 # Create the Fetch Data button
 fetch_button = ttk.Button(scrollable_frame, text="Fetch Data", command=fetch_lookup_data)
-fetch_button.grid(row=0, column=18, padx=(20, 0))  # Adjust position of the button
+fetch_button.grid(row=0, column=4, padx=(20, 0))  # Adjust position of the button
 
 
-def Modify_po_lines():
+def Modify_lookup_values():
     try:
         connection = pyodbc.connect('Driver={SQL Server};'
-                        'Server=LAPTOP-687KHBP5\SQLEXPRESS;'
+                       'Server=LAPTOP-687KHBP5\SQLEXPRESS;'
                       'Database=InfraDB;'
                         'Trusted_Connection=yes;')
         connection.autocommit = True
@@ -141,22 +118,24 @@ def Modify_po_lines():
         # Assuming username is passed as a command-line argument or an empty string if not provided
         username = sys.argv[1] if len(sys.argv) > 1 else ''
 
-        # Get the PO number from the entry field
-        po_header_id = entry_fields[0].get()
+        # Get the lookup type from the entry field
+        lookup_value_id = entry_fields[0].get()
 
-        # Check if the PO number already exists in the database
+        # Check if the lookup type already exists in the database
         cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*) FROM PO_LINES WHERE PO_HEADER_ID = ?", (po_header_id,))
+        cursor.execute("SELECT COUNT(*) FROM Lookup_Values WHERE LOOKUP_VALUE_ID = ?", (lookup_value_id,))
         count = cursor.fetchone()[0]
+
         if count > 0:
-            # If PO number exists, perform update
+            # If lookup type exists, perform update
             query = """
-                UPDATE PO_LINES
-                SET PO_LINE_NUMBER = ?, ITEM_ID = ?, PO_LINE_DESCRIPTION = ?, QUANTITY = ?, UNIT_PRICE = ?, LINE_TAX_AMOUNT = ?, SUPPORT_START_DATE = ?, SUPPORT_END_DATE = ?, NEED_BY_DATE = ?, PO_LINE_STATUS = ?, SHIP_LOCATION = ?, INVOICE_NUMBER = ?, INVOICE_LINE_NUMBER = ?, INVOICE_DATE = ?, INVOICE_PAID = ?, INVOICE_AMOUNT = ?, PO_LINE_COMMENTS = ?, LAST_UPDATE_DATE = ?, LAST_UPDATED_BY_USER= ?
-                WHERE PO_HEADER_ID = ?
+                UPDATE Lookup_Values
+                SET LOOKUP_TYPE_ID = ?, LOOKUP_CODE = ?, LOOKUP_VALUE = ?, VALUE_DESCRIPTION = ?, ENABLED_FLAG = ?, LAST_UPDATE_DATE = ?, LAST_UPDATED_BY_USER= ?
+                WHERE LOOKUP_VALUE_ID = ?
             """
-            query_params = (entry_fields[1].get(), entry_fields[2].get(), entry_fields[3].get(), entry_fields[4].get(), entry_fields[5].get(), entry_fields[6].get(), entry_fields[7].get(), entry_fields[8].get(), entry_fields[9].get(), entry_fields[10].get(), entry_fields[11].get(), entry_fields[12].get(), entry_fields[13].get(), entry_fields[14].get(), entry_fields[15].get(), entry_fields[16].get(), entry_fields[17].get(),current_date, username, po_header_id)
+            query_params = (entry_fields[1].get(), entry_fields[2].get(), entry_fields[3].get(), entry_fields[4].get(), entry_fields[5].get(), current_date, username, lookup_value_id)
         
+
         # Use parameterized query to avoid SQL injection and handle date conversion
         connection.execute(query, query_params)
 
@@ -186,7 +165,7 @@ def get_bold_font():
     return font.Font(weight="bold")
 
 # Create buttons with bold text
-insert_button = tk.Button(button_frame, text="UPDATE", command=Modify_po_lines,
+insert_button = tk.Button(button_frame, text="UPDATE", command=Modify_lookup_values,
                           foreground="black", font=font.Font(size=10, weight="bold"), width=7, height=1, background="#e0e0e0")
 insert_button.grid(row=0, column=0, pady=(10, 5), padx=50)
 
@@ -199,7 +178,7 @@ cancel_button = tk.Button(button_frame, text="CANCEL", command=cancel,
 cancel_button.grid(row=0, column=2, pady=(10, 5), padx=50)
 
 
-info_label_inventory = ttk.Label(app, text="3S Technologies - PO LINES ")
+info_label_inventory = ttk.Label(app, text="3S Technologies - LOOKUP VALUES")
 info_label_inventory.place(relx=0.1, rely=0.95)  # Adjusted y-position
 
 app.mainloop()
